@@ -1,17 +1,17 @@
 require "base/internal/ui/reflexcore"
 --fyi this isnt working yet!
-htest =
+madhudhorizontest =
 {
 };
 
-registerWidget("htest");
+registerWidget("madhudhorizontest");
 --math.pi
 --math.rad
 --math.deg
 --nvgRect(x, y, w, h)
 -- remember to translate 180 degrees into fov like 110
 
-function htest:initialize()
+function madhudhorizontest:initialize()
 	function percent(inperc, fullperc)
 		if (1 / fullperc) >= 0
 		or inperc == nil or fullperc == nil
@@ -20,38 +20,37 @@ function htest:initialize()
 		end
 	end
 end
-	function htest:draw()
-		if not shouldShowHUD() then return end;
-		player = getPlayer()
-		y90 = player.anglesDegrees.y - 90
-		xpos = percent(player.anglesDegrees.x, 360)
-		ypos = percent(y90, 180)
+function madhudhorizontest:draw()
+	if not shouldShowHUD() then return end;
+	player = getPlayer()
+	y90 = player.anglesDegrees.y - 90
+	xpos = percent(player.anglesDegrees.x, 360)
+	ypos = percent(y90, 180)
 
-		yposmin = math.min(ypos, 1)
+	yposmin = math.min(ypos, 1)
 
-		ylerp2 = lerp(300, -300, yposmin)
+	ylerp2 = lerp(300, -300, yposmin)
 
-		-- screenw = 600 --viewport.width
-		-- screenh = 1000 --viewport.height
+	-- screenw = 600 --viewport.width
+	-- screenh = 1000 --viewport.height
 
-		-- yhpos = percent(screenh, ypos)
-		-- xwpos = percent(screenw, xpos)
+	-- yhpos = percent(screenh, ypos)
+	-- xwpos = percent(screenw, xpos)
 
-		xlerpd = lerp(1000, -1000, xpos)
-		-- ylerpd = lerp(600, -600, ypos)
+	xlerpd = lerp(1000, -1000, xpos)
+	-- ylerpd = lerp(600, -600, ypos)
 
-		-- yhpos = percent(ypos, screenh)
-		-- xwpos = percent(xpos, screenw)
+	-- yhpos = percent(ypos, screenh)
+	-- xwpos = percent(xpos, screenw)
 
-		nvgBeginPath();
-		nvgRect((xlerpd), (ylerp2), 40, 40)
-		nvgFillColor(Color(255, 255, 255, 255));
-		nvgFill();
+	nvgBeginPath();
+	nvgRect((xlerpd), (ylerp2), 40, 40)
+	nvgFillColor(Color(255, 255, 255, 255));
+	nvgFill();
 
-		nvgFontSize(18);
-		nvgFontFace("Volter__28Goldfish_29");
-		nvgTextAlign(NVG_ALIGN_CENTER, NVG_ALIGN_MIDDLE);
-		nvgText(200, 0,ypos.. "y");
-		nvgText(-200, 0, xlerpd.. "x");
-
-	end
+	nvgFontSize(18);
+	nvgFontFace("Volter__28Goldfish_29");
+	nvgTextAlign(NVG_ALIGN_CENTER, NVG_ALIGN_MIDDLE);
+	nvgText(200, 0,ypos.. "y");
+	nvgText(-200, 0, xlerpd.. "x");
+end
