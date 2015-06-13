@@ -10,6 +10,7 @@ registerWidget("madhudhorizontest");
 --math.deg
 --nvgRect(x, y, w, h)
 -- remember to translate 180 degrees into fov like 110
+mhcolor = Color(155,255,155,180)
 
 function madhudhorizontest:initialize()
 	function percent(inperc, fullperc)
@@ -45,7 +46,7 @@ function madhudhorizontest:draw()
 
 	nvgBeginPath();
 	nvgRect((xlerpd), (ylerp2), 40, 40)
-	nvgFillColor(Color(255, 255, 255, 255));
+	nvgFillColor(mhcolor);
 	nvgFill();
 
 	nvgFontSize(18);
