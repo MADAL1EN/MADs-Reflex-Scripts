@@ -3,6 +3,7 @@ madhudspeed =
 {
 };
 registerWidget("madhudspeed");
+testspeed = 0
 
 function madhudspeed:draw() --A lot of this stuff probably should be before draw
 	if not shouldShowHUD() then return end; --get rid of second not
@@ -24,8 +25,8 @@ function madhudspeed:draw() --A lot of this stuff probably should be before draw
 	--static helpers
 	local player = getPlayer()
 	local speed = math.ceil(player.speed)
-	_G.speed = lerp(_G.speed, speed, 0.05) --last number should be in widget prefs for smoothing scale
-	local lerpdspeed = round(_G.speed)
+	testspeed = lerp(testspeed, speed, 0.05) --last number should be in widget prefs for smoothing scale
+	local lerpdspeed = round(testspeed)
 	--the Y location changes by speed
 	local ylocation = lerpdspeed * speedscale
 	local linewidth = 25
