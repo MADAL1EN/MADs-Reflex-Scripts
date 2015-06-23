@@ -5,27 +5,31 @@ madhudspeed =
 registerWidget("madhudspeed");
 testspeed = 0
 
-function madhudspeed:draw() --A lot of this stuff probably should be before draw
-	if not shouldShowHUD() then return end; --get rid of second not
-
+function madhudspeed:draw() --A lot of this stuff probably should be before draw()
+	if not shouldShowHUD() or not isRaceMode() then return end;
+	local fps = 1/deltaTimeRaw
 	local speedscale = 1 --scale the Y stuff
 
-	--Once scaling etc is working make these available in the widget prefs
+	--Make these available in the widget prefs
 	local topy = 400 * speedscale--Bounding Box
 	local bottomy = 0 --Bounding Box (always 0?)
 	local speedmetercolor = Color(125,255,125,180)
 	local yoffset = topy/2 --center the bars on the y axis
 	local bartotextxoffset = 5
+	local lerpspeed = clamp(30 * deltaTimeRaw, 0.0001, 1) --I think frame dependant animation has been fixed.
+	-- make the first number in lerpspeed a widget pref
+
+	-- maybe add easing, like fast in slow out?
 
 	--precision speed text indicator box params
 	local boxheight = 20
-	local boxwidth = 51.5 -- maybe make this dynamic or scissor it
+	local boxwidth = 51.5 -- maybe make this dynamic or scissor it for 9999+
 	local boxoffset = 10
 
 	--static helpers
 	local player = getPlayer()
 	local speed = math.ceil(player.speed)
-	testspeed = lerp(testspeed, speed, 0.05) --last number should be in widget prefs for smoothing scale
+	testspeed = lerp(testspeed, speed, lerpspeed)
 	local lerpdspeed = round(testspeed)
 	--the Y location changes by speed
 	local ylocation = lerpdspeed * speedscale
@@ -63,3 +67,5 @@ function madhudspeed:draw() --A lot of this stuff probably should be before draw
 	end
 end
 end
+
+--Some credit goes to Qualx, AliasedFrog and other dudes in #reflex for helping me with lua questions.
