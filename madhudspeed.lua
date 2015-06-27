@@ -7,6 +7,8 @@ function madhudspeed:initialize()
 	self.userData = loadUserData();
 	CheckSetDefaultValue(self, "userData", "table", {});
 	CheckSetDefaultValue(self.userData, "bAlpha", "number", 180);
+	CheckSetDefaultValue(self.userData, "nAlpha", "number", 200);
+	CheckSetDefaultValue(self.userData, "upsIncrement", "number", 50);
 end
 
 function clampToNoDecimal(n)
@@ -14,16 +16,33 @@ function clampToNoDecimal(n)
 end
 
 function madhudspeed:drawOptions(x, y)
+	ygap = 40
 
-	uiLabel("Bar Alpha:", x, y);
+	uiLabel("Transparency of Bars:", x, y);
 	local sliderWidth = 200;
-	local sliderStart = 140;
+	local sliderStart = 240;
 	local user = self.userData;
-
 	user.bAlpha = clampToNoDecimal(uiSlider(x + sliderStart, y, sliderWidth, 0, 255, user.bAlpha));
 	user.bAlpha = clampToNoDecimal(uiEditBox(user.bAlpha, x + sliderStart + sliderWidth + 10, y, 60));
-	saveUserData(user);
 
+	y = y + ygap;
+
+	uiLabel("Transparency of Numbers:", x, y);
+	local sliderWidth = 200;
+	local sliderStart = 240;
+	local user = self.userData;
+	user.nAlpha = clampToNoDecimal(uiSlider(x + sliderStart, y, sliderWidth, 0, 255, user.nAlpha));
+	user.nAlpha = clampToNoDecimal(uiEditBox(user.nAlpha, x + sliderStart + sliderWidth + 10, y, 60));
+
+	y = y + ygap;
+
+	uiLabel("Speed Display Increment:", x, y);
+	local sliderWidth = 200;
+	local sliderStart = 240;
+	local user = self.userData;
+	user.upsIncrement = clampToNoDecimal(uiEditBox(user.upsIncrement, x + sliderStart + sliderWidth + 10, y, 60));
+
+	saveUserData(user);
 end
 
 registerWidget("madhudspeed");
@@ -37,18 +56,17 @@ function madhudspeed:draw() --A lot of this stuff probably should be before draw
 	local topy = 400 * speedscale--Bounding Box  --self.userData.topy
 	local bottomy = 0 --Bounding Box (always 0?)
 	local speedmeteralpha = self.userData.bAlpha
-	local speedmetercolor = Color(125,255,125,speedmeteralpha)
+	local speedmetercolor = Color(125,255,125,speedmeteralpha) --make these colours available in prefs
+	local textalpha = self.userData.nAlpha
+	local textcolour = Color(255, 255, 255, textalpha)
 	local yoffset = topy/2 --center the bars on the y axis
 	local bartotextxoffset = 5
 	local lerpspeedscale = 30
-	local lerpspeed = clamp(lerpspeedscale * deltaTimeRaw, 0.0001, 1) --I think frame dependant animation has been fixed.
-	-- make the first number in lerpspeed a widget pref
-
-	-- maybe add easing, like fast in slow out?
+	local lerpspeed = clamp(lerpspeedscale * deltaTimeRaw, 0.0001, 1) --maybe add easing, like fast in slow out?
 
 	--precision speed text indicator box params
 	local boxheight = 20
-	local boxwidth = 51.5 -- maybe make this dynamic or scissor it for 9999+
+	local boxwidth = 51.5 --maybe make this dynamic or scissor it for 9999+
 	local boxoffset = 10
 
 	--static helpers
@@ -56,12 +74,13 @@ function madhudspeed:draw() --A lot of this stuff probably should be before draw
 	local speed = math.ceil(player.speed)
 	testspeed = lerp(testspeed, speed, lerpspeed)
 	local lerpdspeed = round(testspeed)
-	--the Y location changes by speed
-	local ylocation = lerpdspeed * speedscale
+	local ylocation = lerpdspeed * speedscale --the Y location changes by speed
+
 	local linewidth = 25
 	local linewidthhalf = linewidth/2 --used to centre lines on the x axis
 	local lineheight = 2.5
-	local upsincrement = 50 * speedscale
+	local upsincpref = self.userData.upsIncrement
+	local upsincrement = upsincpref * speedscale
 
 	nvgBeginPath();
 	nvgRect(linewidth/2 + boxoffset, -boxheight/2, boxwidth, boxheight);
@@ -73,6 +92,7 @@ function madhudspeed:draw() --A lot of this stuff probably should be before draw
 	nvgFontSize(18);
 	nvgFontFace("Volter__28Goldfish_29");
 	nvgTextAlign(NVG_ALIGN_RIGHT, NVG_ALIGN_MIDDLE);
+	nvgFillColor(textcolour);
 	nvgText(linewidth * 2 + linewidthhalf + boxoffset, 0, speed);
 
 	--draw the moving bars loop
@@ -87,6 +107,7 @@ function madhudspeed:draw() --A lot of this stuff probably should be before draw
 			nvgFontSize(18);
 			nvgFontFace("Volter__28Goldfish_29");
 			nvgTextAlign(NVG_ALIGN_RIGHT, NVG_ALIGN_MIDDLE);
+			nvgFillColor(textcolour);
 			nvgText(-linewidthhalf + -bartotextxoffset, (ylocation + -yoffset - bardrawloop), bardrawloop + yoffset);
 		end
 	end
