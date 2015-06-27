@@ -2,21 +2,46 @@ require "base/internal/ui/reflexcore"
 madhudspeed =
 {
 };
+
+function madhudspeed:initialize()
+	self.userData = loadUserData();
+	CheckSetDefaultValue(self, "userData", "table", {});
+	CheckSetDefaultValue(self.userData, "bAlpha", "number", 180);
+end
+
+function clampToNoDecimal(n)
+	return math.floor(n * 1) / 1;
+end
+
+function madhudspeed:drawOptions(x, y)
+
+	uiLabel("Bar Alpha:", x, y);
+	local sliderWidth = 200;
+	local sliderStart = 140;
+	local user = self.userData;
+
+	user.bAlpha = clampToNoDecimal(uiSlider(x + sliderStart, y, sliderWidth, 0, 255, user.bAlpha));
+	user.bAlpha = clampToNoDecimal(uiEditBox(user.bAlpha, x + sliderStart + sliderWidth + 10, y, 60));
+	saveUserData(user);
+
+end
+
 registerWidget("madhudspeed");
 testspeed = 0
 
 function madhudspeed:draw() --A lot of this stuff probably should be before draw()
 	if not shouldShowHUD() or not isRaceMode() then return end;
-	local fps = 1/deltaTimeRaw
 	local speedscale = 1 --scale the Y stuff
 
 	--Make these available in the widget prefs
-	local topy = 400 * speedscale--Bounding Box
+	local topy = 400 * speedscale--Bounding Box  --self.userData.topy
 	local bottomy = 0 --Bounding Box (always 0?)
-	local speedmetercolor = Color(125,255,125,180)
+	local speedmeteralpha = self.userData.bAlpha
+	local speedmetercolor = Color(125,255,125,speedmeteralpha)
 	local yoffset = topy/2 --center the bars on the y axis
 	local bartotextxoffset = 5
-	local lerpspeed = clamp(30 * deltaTimeRaw, 0.0001, 1) --I think frame dependant animation has been fixed.
+	local lerpspeedscale = 30
+	local lerpspeed = clamp(lerpspeedscale * deltaTimeRaw, 0.0001, 1) --I think frame dependant animation has been fixed.
 	-- make the first number in lerpspeed a widget pref
 
 	-- maybe add easing, like fast in slow out?
@@ -68,4 +93,4 @@ function madhudspeed:draw() --A lot of this stuff probably should be before draw
 end
 end
 
---Some credit goes to Qualx, AliasedFrog and other dudes in #reflex for helping me with lua questions.
+--Thanks to Qualx, AliasedFrog, Bonuspunkt and other dudes I forgot to mention in #reflex for helping me with lua questions.
