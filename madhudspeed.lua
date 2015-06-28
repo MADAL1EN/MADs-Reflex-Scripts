@@ -6,14 +6,12 @@ madhudspeed =
 function madhudspeed:initialize()
 	self.userData = loadUserData();
 
-
 	CheckSetDefaultValue(self, "userData", "table", {});
 	CheckSetDefaultValue(self.userData, "upsIncrement", "number", 50);
 	color = Color(125,255,125,180)
 	CheckSetDefaultValue(self.userData, "bColor", "table", color);
 	color = Color(255,255,255,220)
 	CheckSetDefaultValue(self.userData, "nColor", "table", color);
-
 end
 
 function clampToNoDecimal(n)
@@ -24,10 +22,10 @@ function madhudspeed:drawOptions(x, y)
 	ygap = 40
 
 	uiLabel("Speed Display Increment:", x, y);
-	local sliderWidth = 200;
-	local sliderStart = 240;
+	local Width = 200;
+	local Start = 240;
 	local user = self.userData;
-	user.upsIncrement = clampToNoDecimal(uiEditBox(user.upsIncrement, x + sliderStart + sliderWidth + 10, y, 60));
+	user.upsIncrement = clampToNoDecimal(uiEditBox(user.upsIncrement, x + Start + Width + 10, y, 60));
 
 	y = y + ygap;
 
@@ -37,7 +35,6 @@ function madhudspeed:drawOptions(x, y)
 
 	uiLabel("Bars Colour:", x, y);
 	local user = self.userData;
-
 	local col = user.color;
 	user.bColor = user.bColor or {r = col.r, g = col.g, b = col.b, a = col.a};
 	user.bColor = uiColorPicker(x + 15,y + ygap, user.bColor,{});
@@ -46,11 +43,9 @@ function madhudspeed:drawOptions(x, y)
 
 	uiLabel("Numbers Colour:", x, y);
 	local user = self.userData;
-
 	local col = user.color;
 	user.nColor = user.nColor or {r = col.r, g = col.g, b = col.b, a = col.a};
 	user.nColor = uiColorPicker(x + 15,y + ygap, user.nColor,{});
-
 
 	-------------------------------------------------------------
 	---------------end copy pasta from aliasedfrog---------------
@@ -100,7 +95,7 @@ function madhudspeed:draw() --A lot of this stuff probably should be before draw
 	nvgStrokeWidth(lineheight);
 	nvgStroke();
 
-	--text inside speed indicator box
+	--numbers inside speed indicator box
 	nvgFontSize(18);
 	nvgFontFace("Volter__28Goldfish_29");
 	nvgTextAlign(NVG_ALIGN_RIGHT, NVG_ALIGN_MIDDLE);
