@@ -5,10 +5,15 @@ madhudspeed =
 
 function madhudspeed:initialize()
 	self.userData = loadUserData();
+
+
 	CheckSetDefaultValue(self, "userData", "table", {});
-	CheckSetDefaultValue(self.userData, "bAlpha", "number", 180);
-	CheckSetDefaultValue(self.userData, "nAlpha", "number", 200);
 	CheckSetDefaultValue(self.userData, "upsIncrement", "number", 50);
+	color = Color(125,255,125,180)
+	CheckSetDefaultValue(self.userData, "bColor", "table", color);
+	color = Color(255,255,255,220)
+	CheckSetDefaultValue(self.userData, "nColor", "table", color);
+
 end
 
 function clampToNoDecimal(n)
@@ -18,29 +23,38 @@ end
 function madhudspeed:drawOptions(x, y)
 	ygap = 40
 
-	uiLabel("Transparency of Bars:", x, y);
-	local sliderWidth = 200;
-	local sliderStart = 240;
-	local user = self.userData;
-	user.bAlpha = clampToNoDecimal(uiSlider(x + sliderStart, y, sliderWidth, 0, 255, user.bAlpha));
-	user.bAlpha = clampToNoDecimal(uiEditBox(user.bAlpha, x + sliderStart + sliderWidth + 10, y, 60));
-
-	y = y + ygap;
-
-	uiLabel("Transparency of Numbers:", x, y);
-	local sliderWidth = 200;
-	local sliderStart = 240;
-	local user = self.userData;
-	user.nAlpha = clampToNoDecimal(uiSlider(x + sliderStart, y, sliderWidth, 0, 255, user.nAlpha));
-	user.nAlpha = clampToNoDecimal(uiEditBox(user.nAlpha, x + sliderStart + sliderWidth + 10, y, 60));
-
-	y = y + ygap;
-
 	uiLabel("Speed Display Increment:", x, y);
 	local sliderWidth = 200;
 	local sliderStart = 240;
 	local user = self.userData;
 	user.upsIncrement = clampToNoDecimal(uiEditBox(user.upsIncrement, x + sliderStart + sliderWidth + 10, y, 60));
+
+	y = y + ygap;
+
+	-----------------------------------------------------------
+	---------------copy pasta from aliasedfrog-----------------
+	-----------------------------------------------------------
+
+	uiLabel("Bars Colour:", x, y);
+	local user = self.userData;
+
+	local col = user.color;
+	user.bColor = user.bColor or {r = col.r, g = col.g, b = col.b, a = col.a};
+	user.bColor = uiColorPicker(x + 15,y + ygap, user.bColor,{});
+
+	y = y + 200 + ygap;
+
+	uiLabel("Numbers Colour:", x, y);
+	local user = self.userData;
+
+	local col = user.color;
+	user.nColor = user.nColor or {r = col.r, g = col.g, b = col.b, a = col.a};
+	user.nColor = uiColorPicker(x + 15,y + ygap, user.nColor,{});
+
+
+	-------------------------------------------------------------
+	---------------end copy pasta from aliasedfrog---------------
+	-------------------------------------------------------------
 
 	saveUserData(user);
 end
@@ -55,10 +69,8 @@ function madhudspeed:draw() --A lot of this stuff probably should be before draw
 	--Make these available in the widget prefs
 	local topy = 400 * speedscale--Bounding Box  --self.userData.topy
 	local bottomy = 0 --Bounding Box (always 0?)
-	local speedmeteralpha = self.userData.bAlpha
-	local speedmetercolor = Color(125,255,125,speedmeteralpha) --make these colours available in prefs
-	local textalpha = self.userData.nAlpha
-	local textcolour = Color(255, 255, 255, textalpha)
+	local speedmetercolor = self.userData.bColor
+	local textcolour = self.userData.nColor
 	local yoffset = topy/2 --center the bars on the y axis
 	local bartotextxoffset = 5
 	local lerpspeedscale = 30
