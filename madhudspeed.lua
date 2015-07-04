@@ -5,7 +5,6 @@ madhudspeed =
 
 function madhudspeed:initialize()
 	self.userData = loadUserData();
-
 	CheckSetDefaultValue(self, "userData", "table", {});
 	CheckSetDefaultValue(self.userData, "upsIncrement", "number", 50);
 	local color = Color(125,255,125,180);
@@ -39,8 +38,8 @@ function madhudspeed:drawOptions(x, y)
 	local y = y + 200 + ygap;
 
 	uiLabel("Numbers Colour:", x, y);
-	local user = self.userData;
-	local col = user.color;
+	local user = self.userData; --TODO Does this need to be here as well?
+	local col = user.color; --TODO Does this need to be here as well?
 	user.nColor = user.nColor or {r = col.r, g = col.g, b = col.b, a = col.a};
 	user.nColor = uiColorPicker(x + 15,y + ygap, user.nColor,{});
 	-------------------------------------------------------------
@@ -50,33 +49,33 @@ function madhudspeed:drawOptions(x, y)
 end;
 
 registerWidget("madhudspeed");
-testspeed = 0;
+mhspeed = 0;
 
-function madhudspeed:draw() --A lot of this stuff probably should be before draw() maybe??
+function madhudspeed:draw() --TODO A lot of this stuff probably should be before draw() maybe??
 	if not shouldShowHUD() or not isRaceMode() then return end;
-	local speedscale = 1; --scale the Y stuff
+	local speedscale = 1; --scales the Y stuff
 
-	--Make these available in the widget prefs
+	--TODO Make these available in the widget prefs
 	local topy = 400 * speedscale; --Bounding Box
 	local bottomy = 0; --Bounding Box (always 0?)
-	local speedmetercolor = self.userData.bColor; --done!
-	local textcolour = self.userData.nColor; --done!
-	local yoffset = topy/2; --center the bars on the y axis
+	local speedmetercolor = self.userData.bColor; --Colour of the bars
+	local textcolour = self.userData.nColor; --Colour of the numbers
+	local yoffset = topy/2; --centers the bars on the y axis
 	local bartotextxoffset = 5;
 	local lerpspeedscale = 30;
-	local lerpspeed = clamp(lerpspeedscale * deltaTimeRaw, 0.0001, 1); --maybe add easing, like fast in slow out?
+	local lerpspeed = clamp(lerpspeedscale * deltaTimeRaw, 0.0001, 1); --IDEA maybe add easing, like fast in slow out?
 
 	--precision speed text indicator box params
 	local boxheight = 20;
-	local boxwidth = 51.5; --maybe make this dynamic or scissor it for 9999+
+	local boxwidth = 51.5; --TODO maybe make this dynamic or scissor it for 9999+ ups?
 	local boxoffset = 10;
 
 	--static helpers
 	local player = getPlayer();
 	local speed = math.ceil(player.speed);
-	testspeed = lerp(testspeed, speed, lerpspeed);
-	local lerpdspeed = round(testspeed);
-	local ylocation = lerpdspeed * speedscale; --the Y location changes by speed
+	mhspeed = lerp(mhspeed, speed, lerpspeed);
+	local lerpdspeed = round(mhspeed);
+	local ylocation = lerpdspeed * speedscale; --Here the Y location changes by speed
 
 	local linewidth = 25;
 	local linewidthhalf = linewidth/2; --used to centre lines on the x axis
@@ -99,7 +98,7 @@ function madhudspeed:draw() --A lot of this stuff probably should be before draw
 	nvgFillColor(textcolour);
 	nvgText(linewidth * 2 + linewidthhalf + boxoffset, 0, speed);
 
-	--draw the moving bars loop
+	--draws the moving bars loop
 	for bardrawloop = (bottomy + -topy), ylocation, upsincrement do
 		if (ylocation - bardrawloop) <= topy and (ylocation - bardrawloop) >= bottomy then do
 			nvgBeginPath();
