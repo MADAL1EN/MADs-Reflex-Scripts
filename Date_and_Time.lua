@@ -45,6 +45,7 @@ function Date_and_Time:initialize()
 	CheckSetDefaultValue(self.userData, "DSTpref", "boolean", false);
 	CheckSetDefaultValue(self.userData, "MilitaryTime", "boolean", false);
 	CheckSetDefaultValue(self.userData, "InvertColours", "boolean", false);
+	CheckSetDefaultValue(self.userData, "ShowBackground", "boolean", false);
 end;
 
 function Date_and_Time:drawOptions(x, y, intensity)
@@ -55,6 +56,9 @@ function Date_and_Time:drawOptions(x, y, intensity)
 	local sliderWidth = 200;
 	local sliderStart = 140;
 
+	user.ShowBackground = ui2RowCheckbox(x, y, WIDGET_PROPERTIES_COL_INDENT, "Background", user.ShowBackground, optargs);
+
+	local y = y + 60;
 	user.InvertColours = ui2RowCheckbox(x, y, WIDGET_PROPERTIES_COL_INDENT, "Invert Colours", user.InvertColours, optargs);
 
 	local y = y + 60;
@@ -72,7 +76,6 @@ end
 
 --==============================================================================
 --TODO
--- Add toggle background/frame option
 -- Add option to change ordering maybe?
 --==============================================================================
 
@@ -83,29 +86,29 @@ function Date_and_Time:draw()
 	if replayName == "menu" or isInMenu() then -- Only draw when menu open
 		local user = self.userData;
 
-		local TTC = user.InvertColours;
 
-		if TTC then timeTextColor = Color(255,255,255,255);
-		else timeTextColor = Color(0,0,0,255);
+		if user.InvertColours then
+			timeTextColor = Color(255,255,255,255);
+			frameColor = Color(0,0,0,128);
+		else
+			timeTextColor = Color(0,0,0,255);
+			frameColor = Color(255,255,255,128);
 		end;
 
 
-		local isMilTime = user.MilitaryTime;
-		local DST = user.DSTpref;
-		local UDT = user.UDTpref;
+		local UDT = user.UDTpref; --Its not a duplicate you dunce, leave it in!
 
-
-		if DST then DSTp = 1;
+		if user.DSTpref then DSTp = 1;
 		else DSTp = 0;
 		end;
 
---epochTimeAdjusted = epochTime + (user.UDTpref + DSTp)
+		local epochTimeAdjusted = epochTime + ((user.UDTpref + DSTp) * 3600)
 
-		local milHours = math.floor(((epochTime / 3600 + (user.UDTpref + DSTp)) % 24));
-		local hours = math.floor(((epochTime / 3600 + (UDT + DSTp)) % 12));
-		local min =  math.floor((epochTime % 3600) / 60);
-		local sec = math.floor((epochTime % 3600) % 60);
-		local dayCount, year, days, month = function(yr) return (yr % 4 == 0 and (yr % 100 ~= 0 or yr % 400 == 0)) and 366 or 365 end, 1970, math.ceil(epochTime/86400) --Leap years
+		local milHours = math.floor((epochTimeAdjusted / 3600) % 24);
+		local hours = math.floor((epochTimeAdjusted / 3600) % 12);
+		local min =  math.floor((epochTimeAdjusted % 3600) / 60);
+		local sec = math.floor((epochTimeAdjusted % 3600) % 60);
+		local dayCount, year, days, month = function(yr) return (yr % 4 == 0 and (yr % 100 ~= 0 or yr % 400 == 0)) and 366 or 365 end, 1970, math.ceil(epochTimeAdjusted/86400) --Leap years
 		while days >= dayCount(year) do days = days - dayCount(year) year = year + 1
 		end; -- Calculate year and days into that year
 
@@ -121,7 +124,7 @@ function Date_and_Time:draw()
 
 
 		-- Format time with zeros
-		if isMilTime then
+		if user.MilitaryTime then
 			timestr = ("%02d:%02d:%02d"):format(milHours,min,sec);
 		else
 			timestr = ("%2d:%02d:%02d %s"):format(hours,min,sec,period);
@@ -156,17 +159,16 @@ function Date_and_Time:draw()
 			"December"
 		};
 
-		--[[
-		local frameColor = Color(0,0,0,128);
-		local frameWidth = 450;
-		local frameHeight = 35;
-		local fontSize = frameHeight * 1.15;
 		-- Frame
-		nvgBeginPath();
-		nvgRoundedRect(-frameWidth/2, -frameHeight/2, frameWidth, frameHeight, 5);
-		nvgFillColor(frameColor);
-		nvgFill();
-		--]]
+		if user.ShowBackground then
+			local frameWidth = 450;
+			local frameHeight = 35;
+			local fontSize = frameHeight * 1.15;
+			nvgBeginPath();
+			nvgRoundedRect(-frameWidth/2, -frameHeight/2, frameWidth, frameHeight, 5);
+			nvgFillColor(frameColor);
+			nvgFill();
+		end
 
 		-- Text
 		nvgFontBlur(0.325);
