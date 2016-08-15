@@ -3,11 +3,8 @@ require "base/internal/ui/reflexcore"
 Date_and_Time = {
 	canPosition = true;
 };
-function ifFunc(k,str,str1)
-	if k == 0 then return "" end
-	return str .. k .. (str1 or "")
-end
-local tabIndexOverflow = function(seed, table) -- function "borrowed from stackoverflow"
+
+local tabIndexOverflow = function(seed, table) --Function (Thanks Stackoverflow)
 	-- This subtracts values from the table from seed until an overflow :thinking:
 	for i = 1, #table do
 		if seed - table[i] <= 0 then
@@ -15,10 +12,6 @@ local tabIndexOverflow = function(seed, table) -- function "borrowed from stacko
 		end;
 		seed = seed - table[i]
 	end;
-end;
-
-function clampToNoDecimal(n)
-	return math.floor(n * 1) / 1;
 end;
 
 --Number to Ordinal (Thanks Quelax)
@@ -71,19 +64,20 @@ function Date_and_Time:drawOptions(x, y, intensity)
 	user.UDTpref = ui2RowSliderEditBox0Decimals(x, y, WIDGET_PROPERTIES_COL_INDENT, WIDGET_PROPERTIES_COL_WIDTH, 80, "Time Zone", 	user.UDTpref, -12, 14, optargs);
 
 	saveUserData(user);
-end
+end;
 
 
 --==============================================================================
 --TODO
--- Add option to change ordering maybe?
+--Add proper string length getting to adjust the frame
+--Add "if anchor left then allign text left"
+--Add option to change ordering maybe?
 --==============================================================================
-
 
 
 registerWidget("Date_and_Time")
 function Date_and_Time:draw()
-	if replayName == "menu" or isInMenu() then -- Only draw when menu open
+	if replayName == "menu" or isInMenu() then -- Only draw when menu is open
 		local user = self.userData;
 
 
@@ -98,19 +92,24 @@ function Date_and_Time:draw()
 
 		local UDT = user.UDTpref; --Its not a duplicate you dunce, leave it in!
 
-		if user.DSTpref then DSTp = 1;
+
+		if user.DSTpref then DSTp = 1; --Daylight savings
 		else DSTp = 0;
 		end;
 
-		local epochTimeAdjusted = epochTime + ((user.UDTpref + DSTp) * 3600)
+
+		local epochTimeAdjusted = epochTime + ((user.UDTpref + DSTp) * 3600) --Takes the time and adds DST/UDT offsets.
 
 		local milHours = math.floor((epochTimeAdjusted / 3600) % 24);
 		local hours = math.floor((epochTimeAdjusted / 3600) % 12);
 		local min =  math.floor((epochTimeAdjusted % 3600) / 60);
 		local sec = math.floor((epochTimeAdjusted % 3600) % 60);
 		local dayCount, year, days, month = function(yr) return (yr % 4 == 0 and (yr % 100 ~= 0 or yr % 400 == 0)) and 366 or 365 end, 1970, math.ceil(epochTimeAdjusted/86400) --Leap years
+
+
+		-- Calculate year and days into that year
 		while days >= dayCount(year) do days = days - dayCount(year) year = year + 1
-		end; -- Calculate year and days into that year
+		end;
 
 
 		local month, days = tabIndexOverflow(days, {31,(dayCount(year) == 366 and 29 or 28),31,30,31,30,31,31,30,31,30,31}); -- Subtract from days to find current month and leftover days
@@ -130,9 +129,10 @@ function Date_and_Time:draw()
 			timestr = ("%2d:%02d:%02d %s"):format(hours,min,sec,period);
 		end;
 
+
 		local DSEC=24*60*60; --How many seconds in a day?
 		local BASE_DOW = 4; --Day of the week offset
-		local dayOfTheWeek= math.ceil(((epochTime/DSEC)+BASE_DOW)%7);
+		local dayOfTheWeek= math.ceil(((epochTime/DSEC)+BASE_DOW)%7); --Returns 1-7
 
 		local longDays = {
 			"Sunday",
@@ -159,6 +159,7 @@ function Date_and_Time:draw()
 			"December"
 		};
 
+
 		-- Frame
 		if user.ShowBackground then
 			local frameWidth = 450;
@@ -169,6 +170,7 @@ function Date_and_Time:draw()
 			nvgFillColor(frameColor);
 			nvgFill();
 		end
+
 
 		-- Text
 		nvgFontBlur(0.325);
