@@ -168,6 +168,7 @@ local function GetTimeColorAndText()
 			text = string.format("%d:%02d", t.minutes, t.seconds);
 		end;
 
+--TODO FIX the 30 seconds XX doesnt work on count up!
 
 		if timeRemaining < lowTime then
 			frameColor = Color(200,0,0,64);

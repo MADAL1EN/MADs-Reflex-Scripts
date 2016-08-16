@@ -90,7 +90,7 @@ function Date_and_Time:draw()
 		end;
 
 
-		local UDT = user.UDTpref; --Its not a duplicate you dunce, leave it in!
+		local UDT = user.UDTpref; --Its not a duplicate ya dunce, leave it in!
 
 
 		if user.DSTpref then DSTp = 1; --Daylight savings
@@ -132,7 +132,7 @@ function Date_and_Time:draw()
 
 		local DSEC=24*60*60; --How many seconds in a day?
 		local BASE_DOW = 4; --Day of the week offset
-		local dayOfTheWeek= math.ceil(((epochTime/DSEC)+BASE_DOW)%7); --Returns 1-7
+		local dayOfTheWeek= math.ceil(((epochTimeAdjusted/DSEC)+BASE_DOW)%7); --Returns 1-7
 
 		local longDays = {
 			"Sunday",
