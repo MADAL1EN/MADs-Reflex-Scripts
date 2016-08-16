@@ -9,13 +9,36 @@ MCPMClock =
 };
 registerWidget("MCPMClock");
 
+function MCPMClock:initialize()
+	self.userData = loadUserData();
+	CheckSetDefaultValue(self, "userData", "table", {});
+	CheckSetDefaultValue(self.userData, "countDirectionUpPref", "boolean", false);
+	CheckSetDefaultValue(self.userData, "cPMStylePref", "boolean", true);
+end
+
+function MCPMClock:drawOptions(x, y, intensity)
+	local optargs = {};
+	optargs.intensity = intensity;
+
+	local user = self.userData;
+	local sliderWidth = 200;
+	local sliderStart = 140;
+
+	user.countDirectionUpPref = ui2RowCheckbox(x, y, WIDGET_PROPERTIES_COL_INDENT, "Count Direction Up", user.countDirectionUpPref, optargs);
+
+	y=y+60
+	user.cPMStylePref = ui2RowCheckbox(x, y, WIDGET_PROPERTIES_COL_INDENT, "CPM style seconds", user.cPMStylePref, optargs);
+
+
+	saveUserData(user);
+end;
+
 local function sortDescending(a, b)
-return a.score > b.score;
+	return a.score > b.score;
 end
 
 --------------------------------------------------------------------------------
 local function GetDeltaColorAndText()
-
 	local textColor = Color(255,255,255,255);
 	local frameColor = Color(48,48,48,255);
 	local deltaScore = 0;
@@ -124,7 +147,12 @@ local function GetTimeColorAndText()
 
 	if (world.gameState == GAME_STATE_ACTIVE) or (world.gameState == GAME_STATE_ROUNDACTIVE) then
 
-		local timeRemaining = world.gameTimeLimit - world.gameTime;
+		if countDirectionUpPref then
+			timeRemaining = world.gameTime;
+		else
+			timeRemaining = world.gameTimeLimit - world.gameTime;
+		end
+
 		if timeRemaining < 0 then
 			timeRemaining = 0;
 		end;
@@ -134,8 +162,8 @@ local function GetTimeColorAndText()
 
 		if timeRemaining > 5940000 then
 			text = string.format("-"); -- if time left is over 99 minutes show a - instead
-		elseif timeRemaining > lowTime and gameMode.shortName == "1v1" and localPlayer.state == PLAYER_STATE_INGAME then
-			text = string.format("%d:××", t.minutes); --only show the cpm style xx if we are playing in a 1v1 and 30 seconds is not remaining
+		elseif timeRemaining > lowTime and gameMode.shortName == "1v1" and localPlayer.state == PLAYER_STATE_INGAME and cPMStylePref then
+			text = string.format("%d:××", t.minutes); --only show the cpm style xx if we are playing in a 1v1 and 30 seconds is not remaining and were in game and the user setting is enabled.
 		else
 			text = string.format("%d:%02d", t.minutes, t.seconds);
 		end;
@@ -159,6 +187,9 @@ function MCPMClock:draw()
 
 	-- Early out if HUD shouldn't be shown.
 	if not shouldShowHUD() then return end;
+	local user = self.userData
+	countDirectionUpPref = user.countDirectionUpPref
+	cPMStylePref = user.cPMStylePref
 
 	local timeColor, timeFrameColor, timeText, timeSize = GetTimeColorAndText();
 	local deltaColor, deltaFrameColor, deltaText = GetDeltaColorAndText();
