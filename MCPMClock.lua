@@ -146,31 +146,33 @@ local function GetTimeColorAndText()
 	local size = 52;
 
 	if (world.gameState == GAME_STATE_ACTIVE) or (world.gameState == GAME_STATE_ROUNDACTIVE) then
-
-		if countDirectionUpPref then
+		if countDirectionUpPref then -- If we want to count up then
 			timeRemaining = world.gameTime;
+			lowTime = world.gameTimeLimit - 30000
+			shouldShowSeconds = timeRemaining > lowTime
 		else
 			timeRemaining = world.gameTimeLimit - world.gameTime;
+			lowTime = 30000 -- 30 Seconds
+			shouldShowSeconds = timeRemaining < lowTime
 		end
 
 		if timeRemaining < 0 then
-			timeRemaining = 0;
+			timeRemaining = 0; --Dont let the time go below 0 when counting down.
+		elseif timeRemaining > world.gameTimeLimit then
+			timeRemaining = world.gameTimeLimit; --Dont let the time go above the time limit when counting up.
 		end;
 
 		local t = FormatTime(timeRemaining);
-		local lowTime = 30000; -- in milliseconds
 
 		if timeRemaining > 5940000 then
 			text = string.format("-"); -- if time left is over 99 minutes show a - instead
-		elseif timeRemaining > lowTime and gameMode.shortName == "1v1" and localPlayer.state == PLAYER_STATE_INGAME and cPMStylePref then
+		elseif not shouldShowSeconds and gameMode.shortName == "1v1" and localPlayer.state == PLAYER_STATE_INGAME and cPMStylePref then
 			text = string.format("%d:××", t.minutes); --only show the cpm style xx if we are playing in a 1v1 and 30 seconds is not remaining and were in game and the user setting is enabled.
 		else
 			text = string.format("%d:%02d", t.minutes, t.seconds);
 		end;
 
---TODO FIX the 30 seconds XX doesnt work on count up!
-
-		if timeRemaining < lowTime then
+		if shouldShowSeconds then
 			frameColor = Color(200,0,0,64);
 			textColor = Color(255,255,255,255);
 		end;
