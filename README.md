@@ -22,6 +22,12 @@ Example: Monday, January, 1st, 5:30pm
 **MFastCaps.lua**
 Shows the exact time taken to capture a flag.
 
+Features:
+
+- Toggle only show in warmup. (TODO)
+- Print times to console. (TODO)
+- List fastest times like a mini default race scoreboard. (TODO Maybe?)
+
 
 ----------
 **MCPMClock.lua**
@@ -37,3 +43,21 @@ Features:
 ----------
 **madhudspeed.lua**
 A early work in progress speedometer display which works with any speed.
+
+Features:
+
+- Customizable colours.
+- Adjustable speed display increments.
+- Toggle to only show in race mode. (TODO)
+
+
+----------
+**JumpSpeed.lua**
+Displays the exact speed you were at when a jump was performed.
+Only shows up in race mode.
+
+
+----------
+**MMouseSpeed.lua**
+A small widget that visually shows how much you move your mouse on the X axis.
+Useful for defrag to make sure you are not stopping your acceleration.
