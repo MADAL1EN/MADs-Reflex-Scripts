@@ -187,9 +187,9 @@ end;
 
 --------------------------------------------------------------------------------
 function MCPMClock:draw()
-
 	-- Early out if HUD shouldn't be shown.
-	if not shouldShowHUD() then return end;
+	if not shouldShowHUD({showWhenDead = true}) then return end;
+
 	local user = self.userData
 	countDirectionUpPref = user.countDirectionUpPref
 	cPMStylePref = user.cPMStylePref
