@@ -5,6 +5,7 @@
 A collection of widgets and scripts I have made for reflex.
 
 This is not the release branch so these widgets will be in various states of completion.
+(TODO - Add screenshots of widgets in game and in the options menu)
 
 
 ----------
@@ -44,7 +45,7 @@ Features:
 
 - Toggle count up or down.
 - Toggle the CPM style seconds hider.
-- CPM style seconds only show up in duel while you are playing.
+- CPM style seconds only show up in duel while you are playing and there is more than 30 seconds left.
 
 
 ----------
