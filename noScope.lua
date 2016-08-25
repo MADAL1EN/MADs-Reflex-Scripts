@@ -1,6 +1,7 @@
 require "base/internal/ui/reflexcore"
 
 --TODO
+--Make Z value so that it draws way behind every other hud element?
 --make function if fov>75 draw scope
 --X Hitmarker
 -- +420 on kill
@@ -22,21 +23,20 @@ end
 
 function noScope:draw()
 	if not shouldShowHUD() then return end;
-	local nvgOffsetX = 1920/2
-	local nvgOffsetY = 1080/2
 
-	local svgName = "internal/ui/icons/cod4_scope_wip";
+	local nvgOffSetX = 1920/2
+	local nvgOffSetY = 1080/2
+	local fixWindageOffSetY = 8 -- Lol
+
 	local scopeColor = Color(0, 0, 0, 255)
 	local scopeColorTest = Color(255, 0, 0, 255)
 
-	nvgBeginPath();
-	nvgSvg(svgName, 0, 0, 1000);
-
 	--------------------
+
 	--Outer Scope
 	nvgBeginPath()
-	nvgRect(-1920/2, -1080/2, 1920, 1080);
-	nvgCircle(0,0, 884/2);
+	nvgRect(-nvgOffSetX, -nvgOffSetY, 1920, 1080);
+	nvgCircle(0,0, 880/2);
 	nvgPathWinding(NVG_HOLE);
 	nvgFillColor(Color(0, 0, 0, 255));
 	nvgFill();
@@ -45,7 +45,7 @@ function noScope:draw()
 
 	--Mini Tick Horizontal 1
 	local TickX = 90
-	local TickXOffset = 30
+	local TickXOffSet = 30
 
 	nvgBeginPath()
 	nvgMoveTo(-TickX, 5)
@@ -55,7 +55,7 @@ function noScope:draw()
 	nvgStroke()
 
 	--Mini Tick Horizontal 2
-	local TickX = TickX - TickXOffset
+	local TickX = TickX - TickXOffSet
 	nvgBeginPath()
 	nvgMoveTo(-TickX, 5)
 	nvgLineTo(-TickX, -5)
@@ -64,7 +64,7 @@ function noScope:draw()
 	nvgStroke()
 
 	--Mini Tick Horizontal 3
-	local TickX = TickX - TickXOffset
+	local TickX = TickX - TickXOffSet
 	nvgBeginPath()
 	nvgMoveTo(-TickX, 5)
 	nvgLineTo(-TickX, -5)
@@ -73,7 +73,7 @@ function noScope:draw()
 	nvgStroke()
 
 	--Mini Tick Horizontal 4
-	local TickX = TickX - TickXOffset*2
+	local TickX = TickX - TickXOffSet*2
 	nvgBeginPath()
 	nvgMoveTo(-TickX, 5)
 	nvgLineTo(-TickX, -5)
@@ -82,7 +82,7 @@ function noScope:draw()
 	nvgStroke()
 
 	--Mini Tick Horizontal 5
-	local TickX = TickX - TickXOffset
+	local TickX = TickX - TickXOffSet
 	nvgBeginPath()
 	nvgMoveTo(-TickX, 5)
 	nvgLineTo(-TickX, -5)
@@ -91,7 +91,7 @@ function noScope:draw()
 	nvgStroke()
 
 	--Mini Tick Horizontal 6
-	local TickX = TickX - TickXOffset
+	local TickX = TickX - TickXOffSet
 	nvgBeginPath()
 	nvgMoveTo(-TickX, 5)
 	nvgLineTo(-TickX, -5)
@@ -102,7 +102,7 @@ function noScope:draw()
 	--------------------
 
 	local TickY = 90
-	local TickYOffset = 30
+	local TickYOffSet = 30
 
 	nvgBeginPath()
 	nvgMoveTo(5, TickY)
@@ -112,7 +112,7 @@ function noScope:draw()
 	nvgStroke()
 
 	--Mini Tick Horizontal 2
-	local TickY = TickY - TickYOffset
+	local TickY = TickY - TickYOffSet
 	nvgBeginPath()
 	nvgMoveTo(5, TickY)
 	nvgLineTo(-5, TickY)
@@ -121,7 +121,7 @@ function noScope:draw()
 	nvgStroke()
 
 	--Mini Tick Horizontal 3
-	local TickY = TickY - TickYOffset
+	local TickY = TickY - TickYOffSet
 	nvgBeginPath()
 	nvgMoveTo(5, TickY)
 	nvgLineTo(-5, TickY)
@@ -130,7 +130,7 @@ function noScope:draw()
 	nvgStroke()
 
 	--Mini Tick Horizontal 4
-	local TickY = TickY - TickYOffset*2
+	local TickY = TickY - TickYOffSet*2
 	nvgBeginPath()
 	nvgMoveTo(5, TickY)
 	nvgLineTo(-5, TickY)
@@ -139,7 +139,7 @@ function noScope:draw()
 	nvgStroke()
 
 	--Mini Tick Horizontal 5
-	local TickY = TickY - TickYOffset
+	local TickY = TickY - TickYOffSet
 	nvgBeginPath()
 	nvgMoveTo(5, TickY)
 	nvgLineTo(-5, TickY)
@@ -148,7 +148,7 @@ function noScope:draw()
 	nvgStroke()
 
 	--Mini Tick Horizontal 6
-	local TickY = TickY - TickYOffset
+	local TickY = TickY - TickYOffSet
 	nvgBeginPath()
 	nvgMoveTo(5, TickY)
 	nvgLineTo(-5, TickY)
@@ -197,97 +197,99 @@ function noScope:draw()
 
 	--------------------
 
-	local WindageYOffset = 40
+	local windageYOffSet = 48
+	local windageY = 655.5 - nvgOffSetY + fixWindageOffSetY
 
-	--Windage Top
-	local WindageY = 248/2
+	--windage Top
+
 	nvgBeginPath()
-	nvgMoveTo(-860/2, WindageY)
-	nvgLineTo(860/2, WindageY)
+	nvgMoveTo(520 - nvgOffSetX, windageY)
+	nvgLineTo(880 + 520 - nvgOffSetX, windageY)
 	nvgStrokeColor(scopeColor)
 	nvgStrokeWidth(2)
 	nvgStroke()
 
-	--Windage 01
-	local WindageY = WindageY + WindageYOffset
+
+	--windage 01
+
+	local windageY = windageY + windageYOffSet
 	nvgBeginPath()
-	nvgMoveTo(-400/2, WindageY)
-	nvgLineTo(400/2, WindageY)
+	nvgMoveTo(780 - nvgOffSetX, windageY)
+	nvgLineTo(1140 - nvgOffSetX, windageY)
 	nvgStrokeColor(scopeColor)
 	nvgStrokeWidth(2)
 	nvgStroke()
 
-	--Windage 02
-	local WindageY = WindageY + WindageYOffset
+
+	--windage 02
+
+	local windageY = windageY + windageYOffSet
 	nvgBeginPath()
-	nvgMoveTo(-320/2, WindageY)
-	nvgLineTo(320/2, WindageY)
+	nvgMoveTo(816 - nvgOffSetX, windageY)
+	nvgLineTo(816 + 288 - nvgOffSetX, windageY)
 	nvgStrokeColor(scopeColor)
 	nvgStrokeWidth(2)
 	nvgStroke()
 
-	--Windage 03
-	local WindageY = WindageY + WindageYOffset
+
+	--windage 03
+
+	local windageY = windageY + windageYOffSet
 	nvgBeginPath()
-	nvgMoveTo(-300/2, WindageY)
-	nvgLineTo(300/2, WindageY)
+	nvgMoveTo(844 - nvgOffSetX, windageY)
+	nvgLineTo(1076 - nvgOffSetX, windageY)
 	nvgStrokeColor(scopeColor)
 	nvgStrokeWidth(2)
 	nvgStroke()
 
-	--Windage 04
-	local WindageY = WindageY + WindageYOffset
+
+	--windage 04
+
+	local windageY = windageY + windageYOffSet
 	nvgBeginPath()
-	nvgMoveTo(-255/2, WindageY)
-	nvgLineTo(255/2, WindageY)
+	nvgMoveTo(862 - nvgOffSetX, windageY)
+	nvgLineTo(862 + 198 - nvgOffSetX, windageY)
 	nvgStrokeColor(scopeColor)
 	nvgStrokeWidth(2)
 	nvgStroke()
 
-	--Windage 05
-	local WindageY = WindageY + WindageYOffset
+
+	--windage 05
+
+	local windageY = windageY + windageYOffSet
 	nvgBeginPath()
-	nvgMoveTo(-222/2, WindageY)
-	nvgLineTo(222/2, WindageY)
+	nvgMoveTo(870 - nvgOffSetX, windageY)
+	nvgLineTo(870 + 180 -nvgOffSetX, windageY)
 	nvgStrokeColor(scopeColor)
 	nvgStrokeWidth(2)
 	nvgStroke()
 
-	--Windage 06
-	local WindageY = WindageY + WindageYOffset
-	nvgBeginPath()
-	nvgMoveTo(-200/2, WindageY)
-	nvgLineTo(200/2, WindageY)
-	nvgStrokeColor(scopeColor)
-	nvgStrokeWidth(2)
-	nvgStroke()
 
-	--Windage Bottom
+	--windage Bottom
+
+	local windageY = windageY + windageYOffSet
 	nvgBeginPath()
-	nvgMoveTo(-300/2, -120+(1080/2))
-	nvgLineTo(300/2, -120+(1080/2))
+	nvgMoveTo(780 - nvgOffSetX, windageY)
+	nvgLineTo(1140 - nvgOffSetX, windageY)
 	nvgStrokeColor(scopeColor)
 	nvgStrokeWidth(6)
 	nvgStroke()
 
---------------------
+	--------------------
 
---Bezier
+	--Bezier
 
---nvgBezierTo(c1x, c1y, c2x, c2y, x, y)
---d="M 730.01079,655.50918 C 849.02183,756.80291 870.83956,851.22334 874.99935,944.98585"
+	nvgBeginPath()
+	nvgMoveTo(730 - nvgOffSetX, 655.5 - nvgOffSetY + fixWindageOffSetY)
+	nvgBezierTo(849 - nvgOffSetX, 756.8 - nvgOffSetY + fixWindageOffSetY, 870.84 - nvgOffSetX, 851.2 - nvgOffSetY + fixWindageOffSetY, 875 - nvgOffSetX, 945 - nvgOffSetY + fixWindageOffSetY)
+	nvgStrokeColor(scopeColor)
+	nvgStrokeWidth(2)
+	nvgStroke()
 
-nvgBeginPath()
-nvgMoveTo(730 - nvgOffsetX, 655.5 - nvgOffsetY)
-nvgBezierTo(849 - nvgOffsetX, 756.8 - nvgOffsetY, 870.84 - nvgOffsetX, 851.2 - nvgOffsetY, 875 - nvgOffsetX, 945 - nvgOffsetY)
-nvgStrokeColor(scopeColorTest)
-nvgStrokeWidth(2)
-nvgStroke()
-
---TODO
-
---SVG grid starts from corner and grows to the top right
---NVG grid starts from center and uses -/+
--- Subtract the nvgOffsetX or Y from the SVG numbers for exact results?
-
-end
+	nvgBeginPath()
+	nvgMoveTo(1190 - nvgOffSetX, 655.5 - nvgOffSetY + fixWindageOffSetY)
+	nvgBezierTo(1070 - nvgOffSetX, 756.8 - nvgOffSetY + fixWindageOffSetY, 1049.16 - nvgOffSetX, 851.2 - nvgOffSetY + fixWindageOffSetY, 1045 - nvgOffSetX, 945 - nvgOffSetY + fixWindageOffSetY)
+	nvgStrokeColor(scopeColor)
+	nvgStrokeWidth(2)
+	nvgStroke()
+end -- Before you ask why, ask your self why not?
