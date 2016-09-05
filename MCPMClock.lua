@@ -26,7 +26,7 @@ function MCPMClock:drawOptions(x, y, intensity)
 
 	user.countDirectionUpPref = ui2RowCheckbox(x, y, WIDGET_PROPERTIES_COL_INDENT, "Count Direction Up", user.countDirectionUpPref, optargs);
 
-	y=y+60
+	local y=y+60
 	user.cPMStylePref = ui2RowCheckbox(x, y, WIDGET_PROPERTIES_COL_INDENT, "CPM style seconds", user.cPMStylePref, optargs);
 
 

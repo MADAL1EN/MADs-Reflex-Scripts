@@ -22,7 +22,7 @@ end
 --]]
 
 function noScope:draw()
-	if not shouldShowHUD() then return end;
+	if not shouldShowHUD() or consoleGetVariable("r_fov") >= 65 then return end;
 
 	local nvgOffSetX = 1920/2
 	local nvgOffSetY = 1080/2
@@ -34,28 +34,27 @@ function noScope:draw()
 	--------------------
 
 	--Outer Scope
-	nvgBeginPath()
-	nvgRect(-nvgOffSetX, -nvgOffSetY, 1920, 1080);
+	nvgBeginPath();
+	nvgRect(-viewport.width/2, -viewport.height/2, viewport.width, viewport.height);
 	nvgCircle(0,0, 880/2);
 	nvgPathWinding(NVG_HOLE);
 	nvgFillColor(Color(0, 0, 0, 255));
 	nvgFill();
-
 	--------------------
 
 	--Mini Tick Horizontal 1
 	local TickX = 90
 	local TickXOffSet = 30
 
-	nvgBeginPath()
-	nvgMoveTo(-TickX, 5)
-	nvgLineTo(-TickX, -5)
-	nvgStrokeColor(scopeColor)
-	nvgStrokeWidth(2)
-	nvgStroke()
+	nvgBeginPath();
+	nvgMoveTo(-TickX, 5);
+	nvgLineTo(-TickX, -5);
+	nvgStrokeColor(scopeColor);
+	nvgStrokeWidth(2);
+	nvgStroke();
 
 	--Mini Tick Horizontal 2
-	local TickX = TickX - TickXOffSet
+	local TickX = TickX - TickXOffSet;
 	nvgBeginPath()
 	nvgMoveTo(-TickX, 5)
 	nvgLineTo(-TickX, -5)
