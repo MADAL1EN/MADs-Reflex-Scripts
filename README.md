@@ -15,11 +15,11 @@ Shows the Date and Time in various configurations.
 
 Features:
 
-- 24 or 12 hour
+- Toggle setting for 24 or 12 hour
 - Manual UDT and DST offsets
-- Toggle background and invert colours.
+- Toggle setting for background and invert colours.
 - Only shows up when the menu is open.
-- Change sorting of day/month/time
+- Change sorting of day/month/time (TODO)
 
 Example Display: Monday, January, 1st, 5:30pm
 
@@ -31,8 +31,8 @@ Shows the exact time taken to capture a flag.
 
 Features:
 
-- Toggle only show in warmup. (TODO)
-- Print times to console. (TODO)
+- Toggle setting for only show in warmup. (TODO)
+- Toggle setting for print times to console. (TODO)
 - List fastest times like a mini default race scoreboard. (TODO Maybe?)
 
 
@@ -43,9 +43,11 @@ A CPM style round timer with various options.
 
 Features:
 
-- Toggle count up or down.
-- Toggle the CPM style seconds hider.
-- CPM style seconds only show up in duel while you are playing and there is more than 30 seconds left.
+- Toggle setting to count up or down.
+- Toggle setting to show the CPM style seconds 5:XX.
+- Toggle setting to show the CPM style seconds only in 1v1. (TODO)
+
+CPM style seconds only show up in duel (or all modes if checked) while you are playing and there is more than 30 seconds left.
 
 
 ----------
@@ -57,18 +59,29 @@ Features:
 
 - Customizable colours. (TODO - Update to use fancy ui2 colour picker stuff)
 - Adjustable speed display increments.
-- Toggle to only show in race mode. (TODO)
+- Toggle setting to only show in race mode. (TODO)
 
 
 ----------
 **JumpSpeed.lua**
 
 Displays the exact speed you were at when a jump was performed.
-Only shows up in race mode.
+
+Features:
+
+- Toggle to only show in race mode. (TODO)
+- Toggle setting to print Jump Speeds to console. (TODO)
 
 
 ----------
 **MMouseSpeed.lua**
 
 Displays how much you move your mouse on the X axis.
+Turns green when moving and red when stationary.
 Useful for defrag to make sure you are not stopping your acceleration.
+
+
+----------
+**Sparkles.lua**
+
+Makes your cursor emit rainbow coloured sparkles.
