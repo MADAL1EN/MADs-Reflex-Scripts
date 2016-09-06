@@ -163,7 +163,10 @@ end
 
 
 function Sparkle_Mouse:draw()
-	if not isInMenu() then return end;
+
+	local player = getLocalPlayer();
+
+	if replayName ~= "menu" and player ~= nil and player.state ~= PLAYER_STATE_EDITOR and not isInMenu() and not showScores and not loadScreenVisible then return end;
 
 	local m = mouseRegion(viewport.width, viewport.height, viewport.width, viewport.height);
 
