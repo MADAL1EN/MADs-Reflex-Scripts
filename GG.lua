@@ -17,7 +17,7 @@ function GG:initialize()
   ggSaid = false
   messageTimerActive = false
   ggTimer = 0
-  delayTime = 2
+  delayTime = (math.random() * 5)
   messageToSend = "nil"
   countDown = 0
 end
@@ -35,9 +35,10 @@ function GG:drawOptions(x, y)
   ui2Label("GLHF Message", x, y, optargs)
   user.glhfMessage = string.format("%s", ui2EditBox(user.glhfMessage, 25, y, 125, optargs))
 
-  if user.ggMessage == nil or user.ggMessage == "" then
+  if not user.ggMessage or user.ggMessage == "" then
     user.ggMessage = "gg"
-  elseif user.glhfMessage == nil or user.glhfMessage == "" then
+  end
+  if not user.glhfMessage or user.glhfMessage == "" then
     user.glhfMessage = "glhf"
   end
 
@@ -85,5 +86,6 @@ function GG:draw()
     ggSaid = false
     messageTimerActive = false
     ggTimer = 0
+    delayTime = (math.random() * 5)
   end
 end
