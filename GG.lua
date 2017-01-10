@@ -17,7 +17,8 @@ function GG:initialize()
   ggSaid = false
   messageTimerActive = false
   messageTimer = 0
-  delayTime = 0.5 +(math.random() * 3.5)
+  math.randomseed(epochTime)
+  delayTime = 0.5 + (math.random() * 3.5)
   messageToSend = "nil"
   ggRoundCountUp = 0
 end
@@ -54,6 +55,20 @@ function GG:draw()
   if gameMode.shortName ~= "tdm" and gameMode.shortName ~= "ctf" and gameMode.shortName ~= "1v1" and gameMode.shortName ~= "ffa" then return end
   local user = self.userData
 
+  if messageTimer >= delayTime and (glhfSaid == true or ggSaid == true) and (world.gameState == GAME_STATE_GAMEOVER or world.gameState == GAME_STATE_WARMUP) then
+    consolePerformCommand(messageToSend)
+    glhfSaid = false
+    ggSaid = false
+    messageTimerActive = false
+    messageTimer = 0
+  end
+  -----------------------------
+  if messageTimerActive then
+    messageTimer = messageTimer + deltaTimeRaw
+  else
+    messageTimer = 0
+  end
+  -----------------------------
   if world.timerActive and world.gameState == GAME_STATE_WARMUP then
     ggRoundCountUp = ggRoundCountUp + deltaTimeRaw
   else
@@ -71,21 +86,15 @@ function GG:draw()
     ggSaid = true
     messageTimerActive = true
   end
-  -----------------------------
+
+  if oldGameState == GAME_STATE_GAMEOVER and world.gameState == GAME_STATE_WARMUP then
+    if player.steamId ~= nil then
+      math.randomseed(player.steamId + deltaTimeRaw + epochTime)
+      delayTime = 0.5 + (math.random() * 3.5)
+    else
+      delayTime = 0.5 + (math.random() * 3.5)
+    end
+  end
+
   oldGameState = world.gameState
-  -----------------------------
-  if messageTimerActive then
-    messageTimer = messageTimer + deltaTimeRaw
-  else
-    messageTimer = 0
-  end
-  -----------------------------
-  if messageTimer >= delayTime and (glhfSaid == true or ggSaid == true) and (world.gameState == GAME_STATE_GAMEOVER or world.gameState == GAME_STATE_WARMUP) then
-    consolePerformCommand(messageToSend)
-    glhfSaid = false
-    ggSaid = false
-    messageTimerActive = false
-    messageTimer = 0
-    delayTime = 0.5 +(math.random() * 3.5)
-  end
 end
