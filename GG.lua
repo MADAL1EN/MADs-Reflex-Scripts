@@ -16,10 +16,10 @@ function GG:initialize()
   glhfSaid = false
   ggSaid = false
   messageTimerActive = false
-  ggTimer = 0
-  delayTime = (math.random() * 5)
+  messageTimer = 0
+  delayTime = 0.5 +(math.random() * 3.5)
   messageToSend = "nil"
-  countDown = 0
+  ggRoundCountUp = 0
 end
 
 function GG:drawOptions(x, y)
@@ -54,38 +54,38 @@ function GG:draw()
   if gameMode.shortName ~= "tdm" and gameMode.shortName ~= "ctf" and gameMode.shortName ~= "1v1" and gameMode.shortName ~= "ffa" then return end
   local user = self.userData
 
-  -----------------------------
-  if messageTimerActive then
-    ggTimer = ggTimer + deltaTimeRaw
-  else ggTimer = 0
+  if world.timerActive and world.gameState == GAME_STATE_WARMUP then
+    ggRoundCountUp = ggRoundCountUp + deltaTimeRaw
+  else
+    ggRoundCountUp = 0
   end
   -----------------------------
-  if world.timerActive then
-    countDown = countDown + deltaTimeRaw
-  else countDown = 0
-  end
-  -----------------------------
-
-  if countDown > 0 and countDown < delayTime and world.gameState == GAME_STATE_WARMUP and glhfSaid == false then
+  if not messageTimerActive and ggRoundCountUp > 0 + delayTime - deltaTimeRaw and ggRoundCountUp < delayTime and world.gameState == GAME_STATE_WARMUP and glhfSaid == false then
     messageToSend = string.format("say %s", user.glhfMessage)
     glhfSaid = true
     messageTimerActive = true
   end
 
-  if oldGameState == GAME_STATE_ACTIVE and world.gameState == GAME_STATE_GAMEOVER and ggSaid == false then
+  if not messageTimerActive and oldGameState == GAME_STATE_ACTIVE and world.gameState == GAME_STATE_GAMEOVER and ggSaid == false then
     messageToSend = string.format("say %s", user.ggMessage)
     ggSaid = true
     messageTimerActive = true
   end
-
+  -----------------------------
   oldGameState = world.gameState
-
-  if ggTimer >= delayTime then
+  -----------------------------
+  if messageTimerActive then
+    messageTimer = messageTimer + deltaTimeRaw
+  else
+    messageTimer = 0
+  end
+  -----------------------------
+  if messageTimer >= delayTime and (glhfSaid == true or ggSaid == true) and (world.gameState == GAME_STATE_GAMEOVER or world.gameState == GAME_STATE_WARMUP) then
     consolePerformCommand(messageToSend)
     glhfSaid = false
     ggSaid = false
     messageTimerActive = false
-    ggTimer = 0
-    delayTime = (math.random() * 5)
+    messageTimer = 0
+    delayTime = 0.5 +(math.random() * 3.5)
   end
 end
