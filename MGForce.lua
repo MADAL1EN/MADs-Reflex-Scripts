@@ -1,152 +1,95 @@
+-- This widget was originally based on code By DeLift but has since been re-written.
+
 require "base/internal/ui/reflexcore"
---------------------------------------------------------------------------------
--- Graph code By DeLift
---------------------------------------------------------------------------------
 MGForce = {
   canPosition = true
 }
 registerWidget("MGForce")
-local gTimer = 0
+
 local gForce = 0
-local animationTimer = 0
-local frameThickness = 2
 local playerSpeed = 0
 local playerSpeedOld = 0
 local playerSpeedOldOld = 0
-local rectHeight = 5
-local rectWidth = 20
-
-local player
-local x = 0
-local y = 0
-local h = 100
-local w = 300
---local maxPing = 150
-local maxPacketLoss = 200
-
---local pingArray = {}
-local packetLossArray = {}
+local gForceBarHeight = 1
+local gForceBarWidthMax = 350
+local gForceAlpha = 125
+local gForceColor = Color(12.5, 255, 12.5, 255)
+local gForceBarWidth = 0
+local gForceArray = {}
 
 function MGForce:initialize()
-  widgetCreateConsoleVariable("MGForceWidth", "int", 300)
-  widgetCreateConsoleVariable("MGForceHeight", "int", 100)
-  --widgetCreateConsoleVariable("MGForceMaxPing", "int", 150)
-  widgetCreateConsoleVariable("MGForceMaxPacketLoss", "int", 200)
+  self.userData = loadUserData()
+  CheckSetDefaultValue(self, "userData", "table", {})
+  CheckSetDefaultValue(self.userData, "gForceAlpha", "number", 150)
+  CheckSetDefaultValue(self.userData, "gForceMaxWidth", "number", 250)
 
   for i=0, 100 do
-    --pingArray[i] = 0
-    packetLossArray[i] = 0
+    gForceArray[i] = 0
   end
 end
+
+function MGForce:drawOptions(x, y)
+  local optargs = {}
+  optargs.intensity = intensity
+  local user = self.userData
+
+  user.gForceAlpha = ui2RowSliderEditBox0Decimals(x, y, WIDGET_PROPERTIES_COL_INDENT, WIDGET_PROPERTIES_COL_WIDTH, 80, "Transparency", user.gForceAlpha, 1, 255, optargs)
+
+  local y = y + 60
+  user.gForceMaxWidth = ui2RowSliderEditBox0Decimals(x, y, WIDGET_PROPERTIES_COL_INDENT, WIDGET_PROPERTIES_COL_WIDTH, 80, "Max Bar Width", user.gForceMaxWidth, 15, 500, optargs)
+
+  saveUserData(user)
+end
+
+--TODO if spectate, update at 75hz and average inbetween updates.
 
 function MGForce:draw()
   if not shouldShowStatus() then return end
   local player = getPlayer()
-  if not player or not player.connected then return end
+  if not player or not player.connected or not isRaceMode() then return end
 
-  w = widgetGetConsoleVariable("MGForceWidth")
-  h = widgetGetConsoleVariable("MGForceHeight")
-  --maxPing = widgetGetConsoleVariable("MGForceMaxPing")
-  maxPacketLoss = widgetGetConsoleVariable("MGForceMaxPacketLoss")
+  local user = self.userData
 
   playerSpeedOldOld = playerSpeedOld
   playerSpeedOld = player.speed
-  local playerSpeed = playerSpeedOldOld - playerSpeedOld
-  gForce = playerSpeed
+  local gForce = playerSpeedOldOld - playerSpeedOld
 
-  if playerSpeed >= 0 then
-    gForceWidth = ((playerSpeed*10000)^(1/3))
-  else
-    gForceWidth = ((playerSpeed*10000 * -1)^(1/3))
+  -- Get User Pref stuff
+  local gForceAlpha = user.gForceAlpha
+  local gForceMaxWidth = user.gForceMaxWidth * 0.5
+
+  -- pop last and push the new gForce info to the array
+
+  table.remove(gForceArray)
+  table.insert(gForceArray, 0, gForce)
+
+  -- GForce
+  local i = 0
+  for key, forcePairs in pairs(gForceArray) do
+
+    if (forcePairs < 0) then
+      -- Draw Green
+      gForceBarWidth = (((-forcePairs*10000)^(1/3))*2)
+      gForceColor = Color(12.5, 255, 12.5, gForceAlpha)
+    elseif (forcePairs > 0) then
+      -- Draw Red
+      gForceBarWidth = (((forcePairs*10000)^(1/3))*2)
+      gForceColor = Color(255, 12.5, 12.5, gForceAlpha)
+    else
+      -- Draw Yellow
+      gForceBarWidth = 1
+      gForceColor = Color(255, 255, 25, gForceAlpha)
+    end
+
+    if gForceBarWidth > gForceMaxWidth then
+      gForceBarWidth = gForceMaxWidth
+    end
+
+    nvgBeginPath()
+    nvgRect(-gForceBarWidth, i + gForceBarHeight, gForceBarWidth *2, gForceBarHeight)
+    i = i + gForceBarHeight
+    nvgFillColor(gForceColor)
+    nvgFill()
   end
 
-  -- pop last and push the new ping info to the arrays
-  local packetLoss = gForceWidth
-  local latency = player.speed
-  --table.remove(pingArray)
-  --table.insert(pingArray, 0, latency)
-  table.remove(packetLossArray)
-  table.insert(packetLossArray, 0, packetLoss)
-  --[[
-
-  --Ping background
-  nvgBeginPath()
-  nvgMoveTo(x, y+h)
-  local i = 0
-  for key,ping in pairs(pingArray) do
-  if (ping >= maxPing) then
-  ping = maxPing
-end
-nvgLineTo(x + (i*(w/100)), (h-y-(ping*(h/maxPing))))
-i = i + 1
-end
-nvgLineTo(x+w, y+h)
-nvgFillColor(GetPingColor(latency, Color(140,255,140,100)))
-nvgFill()
---Ping line
-nvgBeginPath()
-local j = 0
-for key,ping in pairs(pingArray) do
-if (ping >= maxPing) then
-ping = maxPing
-end
-if (j == 0) then
-nvgMoveTo(x, (h-y-(ping*(h/maxPing))))
-end
-nvgLineTo(x + (j*(w/100)), (h-y-(ping*(h/maxPing))))
-j = j + 1
-end
-nvgStrokeColor(Color(255,0,0,255))
-nvgStroke()
-
---]]
---PacketLoss
-nvgBeginPath()
-nvgMoveTo(x, y+h)
-local i = 0
-for key,packet in pairs(packetLossArray) do
-  --if (packet >= maxPacketLoss) then
-  -- packet = maxPacketLoss
-  --end
-  nvgLineTo(x + (i*(w/100)), (h-y-(packet*(h/maxPacketLoss))))
-  i = i + 1
-end
-nvgLineTo(x+w, y+h)
-
-if (gForce <= 0.001) then
-  -- Draw Green
-  nvgFillColor(Color(12.5,255,12.5,255))
-elseif (gForce >= 0.001) then
-  -- Draw Red
-  nvgFillColor(Color(255,12.5,12.5,255))
-else
-  -- Draw Yellow
-  nvgFillColor(Color(255,255,25,255))
-end
-
-nvgFill()
-end
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
-
-function MGForce:drawOptions(x, y, intensity)
-  local optargs = {}
-  optargs.intensity = intensity
-
-  local lagWidth = widgetGetConsoleVariable("MGForceWidth")
-  widgetSetConsoleVariable("MGForceWidth", ui2RowSliderEditBox2Decimals(x, y, WIDGET_PROPERTIES_COL_INDENT, WIDGET_PROPERTIES_COL_WIDTH, 80, "Window Width", lagWidth, 1, 500, optargs))
-  y = y + 60
-
-  local lagHeight = widgetGetConsoleVariable("MGForceHeight")
-  widgetSetConsoleVariable("MGForceHeight", ui2RowSliderEditBox2Decimals(x, y, WIDGET_PROPERTIES_COL_INDENT, WIDGET_PROPERTIES_COL_WIDTH, 80, "Window Height", lagHeight, 1, 500, optargs))
-  y = y + 60
-
---  local lagMaxPing = widgetGetConsoleVariable("MGForceMaxPing")
---  widgetSetConsoleVariable("MGForceMaxPing", ui2RowSliderEditBox2Decimals(x, y, WIDGET_PROPERTIES_COL_INDENT, WIDGET_PROPERTIES_COL_WIDTH, 80, "Max Ping", lagMaxPing, 50, 300, optargs))
---  y = y + 60
-
-  local lagMaxPacketLoss = widgetGetConsoleVariable("MGForceMaxPacketLoss")
-  widgetSetConsoleVariable("MGForceMaxPacketLoss", ui2RowSliderEditBox2Decimals(x, y, WIDGET_PROPERTIES_COL_INDENT, WIDGET_PROPERTIES_COL_WIDTH, 80, "Max PacketLoss", lagMaxPacketLoss, 50, 300, optargs))
-  y = y + 60
 end
