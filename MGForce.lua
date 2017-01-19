@@ -6,25 +6,23 @@ MGForce = {
 }
 registerWidget("MGForce")
 
-local gForce = 0
-local playerSpeed = 0
-local playerSpeedOld = 0
-local playerSpeedOldOld = 0
-local gForceBarHeight = 1
-local gForceBarWidthMax = 350
-local gForceAlpha = 125
-local gForceColor = Color(12.5, 255, 12.5, 255)
-local gForceBarWidth = 0
-local gForceArray = {}
-
 function MGForce:initialize()
+  self.gForce = 0
+  self.playerSpeedOld = 0
+  self.playerSpeedOldOld = 0
+  self.gForceBarHeight = 1
+  self.gForceColor = Color(12.5, 255, 12.5, 255)
+  self.gForceBarWidth = 0
+  self.gForceArray = {}
+
   self.userData = loadUserData()
   CheckSetDefaultValue(self, "userData", "table", {})
   CheckSetDefaultValue(self.userData, "gForceAlpha", "number", 150)
   CheckSetDefaultValue(self.userData, "gForceMaxWidth", "number", 250)
+  CheckSetDefaultValue(self.userData, "widthFactor", "number", 2.5)
 
   for i=0, 100 do
-    gForceArray[i] = 0
+    self.gForceArray[i] = 0
   end
 end
 
@@ -36,12 +34,15 @@ function MGForce:drawOptions(x, y)
   user.gForceAlpha = ui2RowSliderEditBox0Decimals(x, y, WIDGET_PROPERTIES_COL_INDENT, WIDGET_PROPERTIES_COL_WIDTH, 80, "Transparency", user.gForceAlpha, 1, 255, optargs)
 
   local y = y + 60
-  user.gForceMaxWidth = ui2RowSliderEditBox0Decimals(x, y, WIDGET_PROPERTIES_COL_INDENT, WIDGET_PROPERTIES_COL_WIDTH, 80, "Max Bar Width", user.gForceMaxWidth, 15, 500, optargs)
+  user.gForceMaxWidth = ui2RowSliderEditBox0Decimals(x, y, WIDGET_PROPERTIES_COL_INDENT, WIDGET_PROPERTIES_COL_WIDTH, 80, "Maximum Bar Width", user.gForceMaxWidth, 15, 500, optargs)
+
+  local y = y + 60
+  user.widthFactor = ui2RowSliderEditBox2Decimals(x, y, WIDGET_PROPERTIES_COL_INDENT, WIDGET_PROPERTIES_COL_WIDTH, 80, "Bar Width Multiplier", user.widthFactor, 1.5, 4, optargs)
+
+  ui2TooltipBox("A smaller number creates a wider bar.", WIDGET_PROPERTIES_COL_INDENT + 20, y, 200, optargs)
 
   saveUserData(user)
 end
-
---TODO if spectate, update at 75hz and average inbetween updates.
 
 function MGForce:draw()
   if not shouldShowStatus() then return end
@@ -50,45 +51,46 @@ function MGForce:draw()
 
   local user = self.userData
 
-  playerSpeedOldOld = playerSpeedOld
-  playerSpeedOld = player.speed
-  local gForce = playerSpeedOldOld - playerSpeedOld
+  self.playerSpeedOldOld = self.playerSpeedOld
+  self.playerSpeedOld = player.speed
+  self.gForce = self.playerSpeedOldOld - self.playerSpeedOld
 
   -- Get User Pref stuff
-  local gForceAlpha = user.gForceAlpha
-  local gForceMaxWidth = user.gForceMaxWidth * 0.5
+  self.widthFactor = user.widthFactor
+  self.gForceAlpha = user.gForceAlpha
+  self.gForceMaxWidth = user.gForceMaxWidth * 0.5
 
   -- pop last and push the new gForce info to the array
 
-  table.remove(gForceArray)
-  table.insert(gForceArray, 0, gForce)
+  table.remove(self.gForceArray)
+  table.insert(self.gForceArray, 0, self.gForce)
 
   -- GForce
   local i = 0
-  for key, forcePairs in pairs(gForceArray) do
+  for key, forcePairs in pairs(self.gForceArray) do
 
     if (forcePairs < 0) then
       -- Draw Green
-      gForceBarWidth = (((-forcePairs*10000)^(1/3))*2)
-      gForceColor = Color(12.5, 255, 12.5, gForceAlpha)
+      self.gForceBarWidth = (((-forcePairs*10000)^(1/self.widthFactor))*2)
+      self.gForceColor = Color(12.5, 255, 12.5, self.gForceAlpha)
     elseif (forcePairs > 0) then
       -- Draw Red
-      gForceBarWidth = (((forcePairs*10000)^(1/3))*2)
-      gForceColor = Color(255, 12.5, 12.5, gForceAlpha)
+      self.gForceBarWidth = (((forcePairs*10000)^(1/self.widthFactor))*2)
+      self.gForceColor = Color(255, 12.5, 12.5, self.gForceAlpha)
     else
       -- Draw Yellow
-      gForceBarWidth = 1
-      gForceColor = Color(255, 255, 25, gForceAlpha)
+      self.gForceBarWidth = 1
+      self.gForceColor = Color(255, 255, 25, self.gForceAlpha)
     end
 
-    if gForceBarWidth > gForceMaxWidth then
-      gForceBarWidth = gForceMaxWidth
+    if self.gForceBarWidth > self.gForceMaxWidth then
+      self.gForceBarWidth = self.gForceMaxWidth
     end
 
     nvgBeginPath()
-    nvgRect(-gForceBarWidth, i + gForceBarHeight, gForceBarWidth *2, gForceBarHeight)
-    i = i + gForceBarHeight
-    nvgFillColor(gForceColor)
+    nvgRect(-(self.gForceBarWidth), (i + self.gForceBarHeight), (self.gForceBarWidth *2), (self.gForceBarHeight))
+    i = i + self.gForceBarHeight
+    nvgFillColor(self.gForceColor)
     nvgFill()
   end
 
